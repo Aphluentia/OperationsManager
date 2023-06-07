@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "w7aJttdAJXrzhCI4xx1JP9ijhz+4xF3LhdDBzyNPzTnpAEwOMuQi6I3XjXmdJ0mGt0gcLu3fcbSfHkVEcLa9SQ==",
+  "dgSpecHash": "7mT7DDdgXccWpsGjClIIvlam7yNvxBmH2Rf/4piu4p7Ugeg5tb5/1q+aQXMrLaMKhc2wcQCcnPdtWv8Du9Kw2w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\E1493\\source\\repos\\Aphluentia\\CommunicationModule\\OperationsManager\\OperationsManager.csproj",
+  "projectFilePath": "C:\\Users\\E1493\\source\\repos\\Aphluentia\\OperationsManager\\OperationsManager\\OperationsManager.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\E1493\\.nuget\\packages\\awssdk.core\\3.7.100.14\\awssdk.core.3.7.100.14.nupkg.sha512",
     "C:\\Users\\E1493\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",
