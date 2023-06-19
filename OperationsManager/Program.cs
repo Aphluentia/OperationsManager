@@ -2,7 +2,6 @@ using OperationsManager.BackgroundServices;
 using OperationsManager.BackgroundServices.Workers;
 using OperationsManager.Configurations;
 using OperationsManager.Database;
-using OperationsManager.Database.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 

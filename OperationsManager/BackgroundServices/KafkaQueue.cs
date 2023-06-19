@@ -1,5 +1,5 @@
 ﻿using OperationsManager.BackgroundServices.Workers;
-using OperationsManager.Models;
+using OperationsManager.Models.BrokerMessageDataField;
 
 namespace OperationsManager.BackgroundServices
 {

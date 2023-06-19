@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OperationsManager.Configurations;
-using OperationsManager.Models;
+using OperationsManager.Models.BrokerMessageDataField;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;

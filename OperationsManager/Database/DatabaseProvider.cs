@@ -1,97 +1,182 @@
 ﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using DatabaseApi.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OperationsManager.Configurations;
+using OperationsManager.Helpers;
+using System;
+using System.Reflection;
 
 namespace OperationsManager.Database
 {
-    public class DatabaseProvider: IDatabaseProvider
+    public class DatabaseProvider : IDatabaseProvider
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _BaseUrl;
+        private readonly string _Therapists, _Modules, _Applications, _Patients;
         public DatabaseProvider(IOptions<DatabaseApiConfigSection> options)
         {
-            _httpClient = new HttpClient();
-            _BaseUrl = options.Value.ConnectionString;
+            _Therapists = $"{options.Value.ConnectionString}/api/Therapist";
+            _Modules = $"{options.Value.ConnectionString}/api/Modules";
+            _Applications = $"{options.Value.ConnectionString}/api/Application";
+            _Patients = $"{options.Value.ConnectionString}/api/Patient";
+
         }
-        private string EndpointBuilder(DatabaseControllers controller, string? id = null, bool isModule = false, string? ModuleId = null)
+
+        public async Task<bool> AddExistingModuleToPatient(string Email, string id)
         {
-            string url = $"{_BaseUrl}/api/{controller.ToString()}";
-            if (!string.IsNullOrEmpty(id)) url += $"/{id}";
-            if (isModule)
-            {
-                url += "/Connection";
-                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(ModuleId))
-                {
-                    url += $"/{id}/{ModuleId}";
-                }
-            }
-            
-            return url;
+            var url = $"{_Patients}/{Email}/Modules/{id}";
+            return await DatabaseOperationsHelper.Post(url, "");
         }
 
-        public async Task<(bool, string?)> Get(DatabaseControllers controller, string? id = null, bool isModule = false)
+        public async Task<bool> AddModuleToPatient(string Email, Module data)
         {
-            var url = EndpointBuilder(controller, id, isModule);
-            var response = await _httpClient.GetAsync(url);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return (false, null);
-            }
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            return (true, responseContent);
+            var url = $"{_Patients}/{Email}/Modules";
+            return await DatabaseOperationsHelper.Post(url, data);
         }
 
-        public async Task<(bool, string?)> Post(object body, DatabaseControllers controller, string? id = null, bool isModule = false)
+        public async Task<bool> CreateModule(Module module)
         {
-            var url = EndpointBuilder(controller, id, isModule);
-            var response = await _httpClient.PostAsJsonAsync(url, body);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return (false, null);
-            }
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            return (true, responseContent);
+            var url = $"{_Modules}";
+            return await DatabaseOperationsHelper.Post(url, module);
         }
 
-        public async Task<(bool, string?)> Put(object body, DatabaseControllers controller, string? id = null, bool isModule = false)
+        public async Task<bool> CreatePatient(Patient patient)
         {
-            var url = EndpointBuilder(controller, id, isModule);
-            var response = await _httpClient.PutAsJsonAsync(url, body);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return (false, null);
-            }
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            return (true, responseContent);
+            var url = $"{_Patients}";
+            return await DatabaseOperationsHelper.Post(url, patient);
         }
 
-        public async Task<(bool, string?)> Delete(DatabaseControllers controller, string? id = null, bool isModule = false, string? ModuleId = null)
+        public async Task<bool> CreateTherapist(Therapist therapist)
         {
-            var url = EndpointBuilder(controller, id, isModule, ModuleId);
-            var response = await _httpClient.DeleteAsync(url);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return (false, null);
-            }
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            return (true, responseContent);
+            var url = $"{_Therapists}";
+            return await DatabaseOperationsHelper.Post(url, therapist);
         }
 
-       
+        public async Task<bool> DeleteApplication(string id)
+        {
 
+            var url = $"{_Applications}/{id}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> DeleteApplicationVersion(string id, string VersionId)
+        {
+            var url = $"{_Applications}/{id}/Version/{VersionId}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> DeleteModule(string id)
+        {
+            var url = $"{_Modules}/{id}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> DeletePatient(string Email)
+        {
+            var url = $"{_Patients}/{Email}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> DeletePatientModule(string Email, string ModuleId)
+        {
+            var url = $"{_Patients}/{Email}/Modules/{ModuleId}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> DeleteTherapist(string Email)
+        {
+            var url = $"{_Therapists}/{Email}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> PatientRejectTherapist(string Email, string Therapist)
+        {
+
+            var url = $"{_Patients}/{Email}/Therapist/{Therapist}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> PatientRequestTherapist(string Email, string Therapist)
+        {
+
+            var url = $"{_Patients}/{Email}/Therapist/{Therapist}";
+            return await DatabaseOperationsHelper.Put(url, "");
+        }
+
+        public async Task<bool> RegisterApplication(Application data)
+        {
+
+            var url = $"{_Applications}";
+            return await DatabaseOperationsHelper.Post(url, data);
+        }
+
+        public async Task<bool> RegisterApplicationVersion(string id, ModuleVersion data)
+        {
+
+            var url = $"{_Applications}/{id}/Version";
+            return await DatabaseOperationsHelper.Post(url, data);
+        }
+
+        public async Task<bool> TherapistAcceptPatient(string Email, string Patient)
+        {
+            var url = $"{_Therapists}/{Email}/Patient/{Patient}";
+            return await DatabaseOperationsHelper.Put(url, "");
+        }
+
+        public async Task<bool> TherapistRejectPatient(string Email, string Patient)
+        {
+            var url = $"{_Therapists}/{Email}/Patient/{Patient}";
+            return await DatabaseOperationsHelper.Delete(url);
+        }
+
+        public async Task<bool> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data)
+        {
+            var url = $"{_Applications}/{ApplicationId}/Version/{VersionId}";
+            return await DatabaseOperationsHelper.Put(url, data);
+        }
+
+        public async Task<bool> UpdateModule(string id, Module data)
+        {
+            var url = $"{_Modules}/{id}";
+            return await DatabaseOperationsHelper.Put(url, data);
+        }
+
+        public async Task<bool> UpdateModuleToVersion(string id, string VersionId)
+        {
+            var url = $"{_Modules}/{id}/Version/{VersionId}";
+            return await DatabaseOperationsHelper.Put(url, "");
+        }
+
+        public async Task<bool> UpdateModuleVersion(string id, Module data)
+        {
+            var url = $"{_Modules}/{id}/Version";
+            return await DatabaseOperationsHelper.Put(url, data);
+        }
+
+        public async Task<bool> UpdatePatient(string Email, Patient data)
+        {
+            var url = $"{_Patients}/{Email}";
+            return await DatabaseOperationsHelper.Put(url, data);
+        }
+
+        public async Task<bool> UpdatePatientModule(string Email, string ModuleId, Module data)
+        {
+            var url = $"{_Patients}/{Email}/Modules/{ModuleId}";
+            return await DatabaseOperationsHelper.Put(url, data);
+        }
+
+        public async Task<bool> UpdatePatientModuleToVersion(string Email, string ModuleId, string VersionId)
+        {
+            var url = $"{_Patients}/{Email}/Modules/{ModuleId}/Version/{VersionId}";
+            return await DatabaseOperationsHelper.Put(url, "");
+        }
+
+        public async Task<bool> UpdateTherapist(string Email, Therapist data)
+        {
+            var url = $"{_Therapists}/{Email}";
+            return await DatabaseOperationsHelper.Put(url, data);
+        }
     }
 }

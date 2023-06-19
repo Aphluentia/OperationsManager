@@ -1,6 +1,6 @@
 ﻿using OperationsManager.Models.Enums;
 
-namespace OperationsManager.Models
+namespace OperationsManager.Models.BrokerMessageDataField
 {
     public class BrokerMessage
     {
