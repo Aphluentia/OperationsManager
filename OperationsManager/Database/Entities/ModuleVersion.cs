@@ -6,7 +6,7 @@ namespace DatabaseApi.Models.Entities
     {
         [BsonId]
         public string VersionId { get; set; }
-        public DateTime? Timestamp { get; set; }
+        public DateTime? Timestamp => DateTime.UtcNow;
         public string? DataStructure { get; set; }
         public string? HtmlCard { get; set; }
         public string? HtmlDashboard { get; set; }

@@ -148,7 +148,7 @@ namespace OperationsManager.Database
             return await DatabaseOperationsHelper.Put(url, "");
         }
 
-        public async Task<bool> UpdateModuleVersion(string id, Module data)
+        public async Task<bool> UpdateModuleVersion(string id, ModuleVersion data)
         {
             var url = $"{_Modules}/{id}/Version";
             return await DatabaseOperationsHelper.Put(url, data);
@@ -168,7 +168,7 @@ namespace OperationsManager.Database
 
         public async Task<bool> UpdatePatientModuleToVersion(string Email, string ModuleId, string VersionId)
         {
-            var url = $"{_Patients}/{Email}/Modules/{ModuleId}/Version/{VersionId}";
+            var url = $"{_Patients}/{Email}/Modules/{ModuleId}?Version={VersionId}";
             return await DatabaseOperationsHelper.Put(url, "");
         }
 

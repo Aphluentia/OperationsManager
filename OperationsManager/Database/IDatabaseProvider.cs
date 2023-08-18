@@ -25,7 +25,7 @@ namespace OperationsManager.Database
         Task<bool> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data);
         Task<bool> UpdateModule(string id, Module data);
         Task<bool> UpdateModuleToVersion(string id, string VersionId);
-        Task<bool> UpdateModuleVersion(string id, Module data);
+        Task<bool> UpdateModuleVersion(string id, ModuleVersion data);
         Task<bool> UpdatePatient(string Email, Patient data);
         Task<bool> UpdatePatientModule(string Email, string ModuleId, Module data);
         Task<bool> UpdatePatientModuleToVersion(string Email, string ModuleId, string VersionId);

@@ -32,7 +32,7 @@ namespace OperationsManager.BackgroundServices.Workers
 
         private async void RunAsync(object sender, DoWorkEventArgs e)
         {
-            LogHelper.Initialize("C:\\Users\\E1493\\OneDrive - Default Directory\\Desktop\\log.txt");
+            LogHelper.Initialize("logs.txt");
             while (!_StopFlag)
             {
                 var message = this._kafkaMonitor.FetchIncomingMessage();
@@ -76,12 +76,8 @@ namespace OperationsManager.BackgroundServices.Workers
                                 success = await _database.DeleteApplication(DELETE_APPLICATION.Id);
                             LogHelper.WriteLog($"Performing delete application operation with success:{success}");
                             break;
-
-
-
                         case Operation.CREATE_MODULE:
                             var CREATE_MODULE = JsonConvert.DeserializeObject<Module>(stringData);
-
                             if (CREATE_MODULE != null)
                                 success = await _database.CreateModule(CREATE_MODULE);
                             LogHelper.WriteLog($"Performing create module operation with success:{success}");
@@ -94,14 +90,14 @@ namespace OperationsManager.BackgroundServices.Workers
                             LogHelper.WriteLog($"Performing update module operation with success:{success}");
                             break;
                         case Operation.UPDATE_MODULE_TO_VERSION:
-                            var UPDATE_MODULE_TO_VERSION = JsonConvert.DeserializeObject<UpdateDto<Module>>(stringData);
+                            var UPDATE_MODULE_TO_VERSION = JsonConvert.DeserializeObject<DeleteDto>(stringData);
 
                             if (UPDATE_MODULE_TO_VERSION != null)
                                 success = await _database.UpdateModuleToVersion(UPDATE_MODULE_TO_VERSION.Id, UPDATE_MODULE_TO_VERSION.Id2);
                             LogHelper.WriteLog($"Performing update module to version operation with success:{success}");
                             break;
                         case Operation.UPDATE_MODULE_VERSION:
-                            var UPDATE_MODULE_VERSION = JsonConvert.DeserializeObject<UpdateDto<Module>>(stringData);
+                            var UPDATE_MODULE_VERSION = JsonConvert.DeserializeObject<UpdateDto<ModuleVersion>>(stringData);
 
                             if (UPDATE_MODULE_VERSION != null)
                                 success = await _database.UpdateModuleVersion(UPDATE_MODULE_VERSION.Id, UPDATE_MODULE_VERSION.Data);

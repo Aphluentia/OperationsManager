@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using OperationsManager.Helpers;
 using System.Text.Json.Nodes;
 
 namespace DatabaseApi.Models.Entities
@@ -10,7 +11,8 @@ namespace DatabaseApi.Models.Entities
         public string Id { get; set; }
         public string Data { get; set; }
         public CustomModuleTemplate ModuleTemplate { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string Checksum { get; set; }
+
+        public DateTime Timestamp = DateTime.UtcNow;
+        public string Checksum => ChecksumHelper.ComputeMD5(Data);
     }
 }
