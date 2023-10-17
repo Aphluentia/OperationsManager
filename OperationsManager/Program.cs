@@ -13,6 +13,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<KafkaConfigSection>(builder.Configuration.GetSection("KafkaConfigSection"));
 builder.Services.Configure<DatabaseApiConfigSection>(builder.Configuration.GetSection("DatabaseApiConfigSection"));
+builder.Services.Configure<OperationsApiConfigSection>(builder.Configuration.GetSection("OperationsApiConfigSection"));
 
 builder.Services.AddSingleton<KafkaQueue>();
 builder.Services.AddSingleton<TKafkaConsumer>();

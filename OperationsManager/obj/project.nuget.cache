@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "7mT7DDdgXccWpsGjClIIvlam7yNvxBmH2Rf/4piu4p7Ugeg5tb5/1q+aQXMrLaMKhc2wcQCcnPdtWv8Du9Kw2w==",
+  "dgSpecHash": "5WA70i9OiLHTSPtC9bYM8um/yo7U/Gr1sZxkqaNmBNEG6aBmlmt96CMm7Yi6jVOQRJTSFYmIbsfaOAQxxlkhjQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\E1493\\source\\repos\\Aphluentia\\OperationsManager\\OperationsManager\\OperationsManager.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\E1493\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",
     "C:\\Users\\E1493\\.nuget\\packages\\confluent.kafka\\2.1.1\\confluent.kafka.2.1.1.nupkg.sha512",
     "C:\\Users\\E1493\\.nuget\\packages\\dnsclient\\1.6.1\\dnsclient.1.6.1.nupkg.sha512",
+    "C:\\Users\\E1493\\.nuget\\packages\\htmlagilitypack\\1.11.54\\htmlagilitypack.1.11.54.nupkg.sha512",
     "C:\\Users\\E1493\\.nuget\\packages\\librdkafka.redist\\2.1.1\\librdkafka.redist.2.1.1.nupkg.sha512",
     "C:\\Users\\E1493\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\E1493\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\2.0.0\\microsoft.extensions.logging.abstractions.2.0.0.nupkg.sha512",

@@ -142,3 +142,4 @@ C:\Users\E1493\source\repos\Aphluentia\OperationsManager\OperationsManager\obj\D
 C:\Users\E1493\source\repos\Aphluentia\OperationsManager\OperationsManager\obj\Debug\net6.0\OperationsManager.pdb
 C:\Users\E1493\source\repos\Aphluentia\OperationsManager\OperationsManager\obj\Debug\net6.0\OperationsManager.genruntimeconfig.cache
 C:\Users\E1493\source\repos\Aphluentia\OperationsManager\OperationsManager\obj\Debug\net6.0\ref\OperationsManager.dll
+C:\Users\E1493\source\repos\Aphluentia\OperationsManager\OperationsManager\bin\Debug\net6.0\HtmlAgilityPack.dll
