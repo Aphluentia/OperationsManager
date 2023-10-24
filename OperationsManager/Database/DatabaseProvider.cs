@@ -65,16 +65,18 @@ namespace OperationsManager.Database
 
             return await HttpHelper.Post(url, v);
         }
-        public async Task<ActionResponse> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data)
-        {
-            var url = $"{_Applications}/{ApplicationId}/Version/{VersionId}";
+        //public async Task<ActionResponse> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data)
+        //{
+        //    var url = $"{_Applications}/{ApplicationId}/Version/{VersionId}"; 
+            
+        //    success = await _database.UpdateModuleToVersion(UPDATE_MODULE_TO_VERSION.Id, UPDATE_MODULE_TO_VERSION.Id2);
 
-            data.ApplicationName = ApplicationId;
-            var verify = ApplicationHelper.VerifyStructure(data);
-            if (verify.Code != System.Net.HttpStatusCode.OK)
-                return verify;
-            return await HttpHelper.Put(url, data);
-        }
+        //    data.ApplicationName = ApplicationId;
+        //    var verify = ApplicationHelper.VerifyStructure(data);
+        //    if (verify.Code != System.Net.HttpStatusCode.OK)
+        //        return verify;
+        //    return await HttpHelper.Put(url, data);
+        //}
         public async Task<ActionResponse> DeleteApplication(string id)
         {
 
@@ -108,13 +110,13 @@ namespace OperationsManager.Database
                     Message = "Application Not Found"
                 };
             var existingPatient = JsonConvert.DeserializeObject<Patient>(patientString);
-            if (string.IsNullOrEmpty(data.FirstName)) existingPatient.FirstName = data.FirstName;
-            if (string.IsNullOrEmpty(data.LastName)) existingPatient.LastName = data.LastName;
-            if (string.IsNullOrEmpty(data.PhoneNumber)) existingPatient.PhoneNumber = data.PhoneNumber;
-            if (string.IsNullOrEmpty(data.Address)) existingPatient.Address = data.Address;
+            if (!string.IsNullOrEmpty(data.FirstName)) existingPatient.FirstName = data.FirstName;
+            if (!string.IsNullOrEmpty(data.LastName)) existingPatient.LastName = data.LastName;
+            if (!string.IsNullOrEmpty(data.PhoneNumber)) existingPatient.PhoneNumber = data.PhoneNumber;
+            if (!string.IsNullOrEmpty(data.Address)) existingPatient.Address = data.Address;
             if (data.Age != 0 && existingPatient.Age != data.Age) existingPatient.Age = data.Age;
-            if (string.IsNullOrEmpty(data.ConditionName)) existingPatient.ConditionName = data.ConditionName;
-            if (string.IsNullOrEmpty(data.ProfilePicture)) existingPatient.ProfilePicture = data.ProfilePicture;
+            if (!string.IsNullOrEmpty(data.ConditionName)) existingPatient.ConditionName = data.ConditionName;
+            if (!string.IsNullOrEmpty(data.ProfilePicture)) existingPatient.ProfilePicture = data.ProfilePicture;
             if (data.ConditionAcquisitionDate != DateTime.MinValue) existingPatient.ConditionAcquisitionDate = data.ConditionAcquisitionDate;
             
 
@@ -167,25 +169,24 @@ namespace OperationsManager.Database
                 var commonSections = module.ModuleData.DataStructure.FirstOrDefault(c => c.SectionName == dataPoint.SectionName);
                 if (commonSections != null && dataPoint.isDataEditable == true)
                 {
-                    dataPoint.Content = JsonHelper.MergeJsonStructures(commonSections.Content.ToString(), dataPoint.Content.ToString());
+                    dataPoint.Content = JsonHelper.MergeJsonStructures(dataPoint.Content.ToString(), commonSections.Content.ToString());
+                    mergedDataStructures.Add(dataPoint);
                 }
                 else
                 {
                     mergedDataStructures.Add(dataPoint);
                 }
             }
+            module.Id = ModuleId;
+            module.ModuleData.ApplicationName = application.ApplicationName;
             module.ModuleData.HtmlCard = version.HtmlCard;
             module.ModuleData.HtmlDashboard = version.HtmlDashboard;
             module.ModuleData.DataStructure = mergedDataStructures;
             module.ModuleData.VersionId = VersionId;
             module.ModuleData.Timestamp = DateTime.UtcNow;
 
-            var validateModule = ApplicationHelper.VerifyModuleStructure(application, module.ModuleData);
-            if (validateModule.Code != System.Net.HttpStatusCode.OK)
-                return validateModule;
-
             url = $"{_Patients}/{Email}/Modules/{ModuleId}";
-            return await HttpHelper.Put(url, data);
+            return await HttpHelper.Put(url, module);
         }
         public async Task<ActionResponse> AddExistingModuleToPatient(string Email, string id)
         {
@@ -204,10 +205,18 @@ namespace OperationsManager.Database
                 };
             var application = JsonConvert.DeserializeObject<Application>(applicationString);
 
+            var version = application.Versions.FirstOrDefault(c => c.VersionId == data.ModuleData.VersionId);
+            if (version != null)
+            {
+                data.ModuleData = version;
+            }
+            else
+            {
+                data.ModuleData = application.Versions.OrderByDescending(s => s.Timestamp).FirstOrDefault();
+            }
 
-            data.ModuleData = application.Versions.OrderByDescending(s => s.Timestamp).FirstOrDefault();
 
-
+            data.ModuleData.Timestamp = DateTime.UtcNow;
 
             url = $"{_Patients}/{Email}/Modules";
             return await HttpHelper.Post(url, data);
@@ -248,7 +257,8 @@ namespace OperationsManager.Database
             var validateModule = ApplicationHelper.VerifyModuleStructure(application, data.ModuleData);
             if (validateModule.Code != System.Net.HttpStatusCode.OK)
                 return validateModule;
-          
+            data.ModuleData.Timestamp = DateTime.UtcNow;
+
             url = $"{_Patients}/{Email}/Modules/{ModuleId}";
 
             return await HttpHelper.Put(url, data);
@@ -298,14 +308,14 @@ namespace OperationsManager.Database
                     Message = "Therapist Not Found"
                 };
             var existingTherapist = JsonConvert.DeserializeObject<Therapist>(therapistString);
-            if (string.IsNullOrEmpty(data.FirstName)) existingTherapist.FirstName = data.FirstName;
-            if (string.IsNullOrEmpty(data.LastName)) existingTherapist.LastName = data.LastName;
+            if (!string.IsNullOrEmpty(data.FirstName)) existingTherapist.FirstName = data.FirstName;
+            if (!string.IsNullOrEmpty(data.LastName)) existingTherapist.LastName = data.LastName;
             if (data.Age != 0 && existingTherapist.Age != data.Age) existingTherapist.Age = data.Age;
-            if (string.IsNullOrEmpty(data.PhoneNumber)) existingTherapist.PhoneNumber = data.PhoneNumber;
-            if (string.IsNullOrEmpty(data.Address)) existingTherapist.Address = data.Address;
-            if (string.IsNullOrEmpty(data.Credentials)) existingTherapist.Credentials = data.Credentials;
-            if (string.IsNullOrEmpty(data.Description)) existingTherapist.Description = data.Description;
-            if (string.IsNullOrEmpty(data.ProfilePicture)) existingTherapist.ProfilePicture = data.ProfilePicture;
+            if (!string.IsNullOrEmpty(data.PhoneNumber)) existingTherapist.PhoneNumber = data.PhoneNumber;
+            if (!string.IsNullOrEmpty(data.Address)) existingTherapist.Address = data.Address;
+            if (!string.IsNullOrEmpty(data.Credentials)) existingTherapist.Credentials = data.Credentials;
+            if (!string.IsNullOrEmpty(data.Description)) existingTherapist.Description = data.Description;
+            if (!string.IsNullOrEmpty(data.ProfilePicture)) existingTherapist.ProfilePicture = data.ProfilePicture;
             
 
             url = $"{_Therapists}/{Email}";
@@ -340,9 +350,17 @@ namespace OperationsManager.Database
                     Message = "Application Not Found"
                 };
             var application = JsonConvert.DeserializeObject<Application>(applicationString);
-            
-            data.ModuleData = application.Versions.OrderByDescending(s => s.Timestamp).FirstOrDefault();
-           
+            var version = application.Versions.FirstOrDefault(c => c.VersionId == data.ModuleData.VersionId);
+            if (version != null)
+            {
+                data.ModuleData = version;
+            }
+            else
+            {
+                data.ModuleData = application.Versions.OrderByDescending(s => s.Timestamp).FirstOrDefault();
+            }
+
+            data.ModuleData.Timestamp = DateTime.UtcNow;
             url = $"{_Modules}";
             return await HttpHelper.Post(url, data);
         }
@@ -455,6 +473,7 @@ namespace OperationsManager.Database
                 Id = Guid.Parse(id),
                 ModuleData = data
             };
+            updatedModule.ModuleData.Timestamp = DateTime.UtcNow;
             return await HttpHelper.Put(url, updatedModule);
         }
 

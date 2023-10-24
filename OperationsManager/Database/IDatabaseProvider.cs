@@ -8,7 +8,7 @@ namespace OperationsManager.Database
     {
         // Application
         Task<ActionResponse> RegisterApplication(Application data);
-        Task<ActionResponse> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data);
+        // Task<ActionResponse> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data);
         Task<ActionResponse> RegisterApplicationVersion(string id, ModuleVersion data);
         Task<ActionResponse> DeleteApplication(string id);
         Task<ActionResponse> DeleteApplicationVersion(string id, string VersionId);

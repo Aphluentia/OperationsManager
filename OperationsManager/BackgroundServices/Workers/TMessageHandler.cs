@@ -66,13 +66,13 @@ namespace OperationsManager.BackgroundServices.Workers
                             LogHelper.WriteLog($"Performing register application version operation with success:{success}");
                             break;
 
-                        case Operation.UPDATE_APPLICATION_VERSION:
-                            var UPDATE_APPLICATION_VERSION = JsonConvert.DeserializeObject<UpdateDto<ModuleVersion>>(stringData);
+                        //case Operation.UPDATE_APPLICATION_VERSION:
+                        //    var UPDATE_APPLICATION_VERSION = JsonConvert.DeserializeObject<UpdateDto<ModuleVersion>>(stringData);
 
-                            if (UPDATE_APPLICATION_VERSION != null)
-                                success = await _database.UpdateApplicationVersion(UPDATE_APPLICATION_VERSION.Id, UPDATE_APPLICATION_VERSION.Id2, UPDATE_APPLICATION_VERSION.Data);
-                            LogHelper.WriteLog($"Performing update application version operation with success:{success}");
-                            break;
+                        //    if (UPDATE_APPLICATION_VERSION != null)
+                        //        success = await _database.UpdateApplicationVersion(UPDATE_APPLICATION_VERSION.Id, UPDATE_APPLICATION_VERSION.Id2, UPDATE_APPLICATION_VERSION.Data);
+                        //    LogHelper.WriteLog($"Performing update application version operation with success:{success}");
+                        //    break;
 
                         case Operation.DELETE_APPLICATION_VERSION:
                             var DELETE_APPLICATION_VERSION = JsonConvert.DeserializeObject<DeleteDto>(stringData);

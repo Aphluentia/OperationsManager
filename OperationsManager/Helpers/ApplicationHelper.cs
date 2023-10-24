@@ -55,7 +55,7 @@ namespace OperationsManager.Helpers
             var dataStructureSections = dataStructure.DataStructure.Select(c => c.SectionName).ToList();
             var moduleDataStructureSections = moduleDataStructure.Select(c => c.SectionName).ToList();
             
-            if (!dataStructureSections.All(c=>moduleDataStructureSections.Contains(c)) || dataStructureSections.Count() != moduleDataStructureSections.Count() )
+            if (!dataStructureSections.All(c=>moduleDataStructureSections.Contains(c)) || dataStructureSections.Count() < moduleDataStructureSections.Count() )
             {
                 return new ActionResponse
                 {
