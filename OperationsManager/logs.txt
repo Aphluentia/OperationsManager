@@ -226,3 +226,41 @@
 10/20/2023 4:32:18 PM - Performing patient reject therapist operation with success:OperationsManager.Database.Entities.ActionResponse
 10/20/2023 4:38:06 PM - Performing update patient module to version operation with success:OperationsManager.Database.Entities.ActionResponse
 10/20/2023 4:40:06 PM - Performing update patient module to version operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:52:54 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:53:29 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:53:41 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:55:49 PM - Performing register application version operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:57:01 PM - Performing create module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:58:56 PM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:59:12 PM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 10:59:48 PM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:00:01 PM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:50:23 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:50:34 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:57:27 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:57:38 PM - Performing register application operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:57:57 PM - Performing register application version operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:58:23 PM - Performing create module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:58:43 PM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/26/2023 11:58:54 PM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:00:18 AM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:00:39 AM - Performing delete module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:00:47 AM - Performing create module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:03:10 AM - Performing delete module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:03:16 AM - Performing create module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:03:41 AM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:04:05 AM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:04:23 AM - Performing update module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:05:09 AM - Performing therapist reject patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:07:41 AM - Performing update module to version operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:09:18 AM - Performing create patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:10:45 AM - Performing update patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:11:42 AM - Performing add module to patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:13:44 AM - Performing add module to patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:13:49 AM - Performing add module to patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:14:41 AM - Performing add existing module to patient operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:15:59 AM - Performing update patient module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:16:37 AM - Performing update patient module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:16:49 AM - Performing update patient module operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:17:40 AM - Performing create therapist operation with success:OperationsManager.Database.Entities.ActionResponse
+10/27/2023 12:18:56 AM - Performing update therapist operation with success:OperationsManager.Database.Entities.ActionResponse

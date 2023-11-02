@@ -10,8 +10,6 @@ namespace OperationsManager.Database
         Task<ActionResponse> RegisterApplication(Application data);
         // Task<ActionResponse> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data);
         Task<ActionResponse> RegisterApplicationVersion(string id, ModuleVersion data);
-        Task<ActionResponse> DeleteApplication(string id);
-        Task<ActionResponse> DeleteApplicationVersion(string id, string VersionId);
 
         // Modules
         Task<ActionResponse> CreateModule(Module module);
@@ -38,8 +36,9 @@ namespace OperationsManager.Database
         Task<ActionResponse> TherapistRejectPatient(string Email, string Patient);
         Task<ActionResponse> DeleteTherapist(string Email);
 
-
-
-
+        Task<ActionResponse> ModuleAddContext(string moduleId, string contextName);
+        Task<ActionResponse> ModuleDeleteContext(string moduleId, string contextName);
+        Task<ActionResponse> AddContextToPatientModule(string patient, string moduleId, string contextName);
+        Task<ActionResponse> DeleteContextFromPatientModule(string patient, string moduleId, string contextName);
     }
 }

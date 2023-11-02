@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using OperationsManager.Configurations;
 using OperationsManager.Database.Entities;
 using OperationsManager.Helpers;
+using System;
+using System.Data;
 
 namespace OperationsManager.Database
 {
@@ -30,6 +32,12 @@ namespace OperationsManager.Database
             foreach (ModuleVersion v in data.Versions)
             {
                 var verify = ApplicationHelper.VerifyStructure(v);
+                if (verify.Code != System.Net.HttpStatusCode.OK)
+                    return verify;
+                verify = ApplicationHelper.VerifyContext(v); 
+                if (verify.Code != System.Net.HttpStatusCode.OK)
+                    return verify;
+                verify = ApplicationHelper.VerifyDispairingContexts(v);
                 if (verify.Code != System.Net.HttpStatusCode.OK)
                     return verify;
             }
@@ -63,32 +71,13 @@ namespace OperationsManager.Database
             if (verify.Code != System.Net.HttpStatusCode.OK)
                 return verify;
 
+            verify = ApplicationHelper.VerifyContext(v);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
+
             return await HttpHelper.Post(url, v);
         }
-        //public async Task<ActionResponse> UpdateApplicationVersion(string ApplicationId, string VersionId, ModuleVersion data)
-        //{
-        //    var url = $"{_Applications}/{ApplicationId}/Version/{VersionId}"; 
-            
-        //    success = await _database.UpdateModuleToVersion(UPDATE_MODULE_TO_VERSION.Id, UPDATE_MODULE_TO_VERSION.Id2);
 
-        //    data.ApplicationName = ApplicationId;
-        //    var verify = ApplicationHelper.VerifyStructure(data);
-        //    if (verify.Code != System.Net.HttpStatusCode.OK)
-        //        return verify;
-        //    return await HttpHelper.Put(url, data);
-        //}
-        public async Task<ActionResponse> DeleteApplication(string id)
-        {
-
-            var url = $"{_Applications}/{id}";
-            return await HttpHelper.Delete(url);
-        }
-
-        public async Task<ActionResponse> DeleteApplicationVersion(string id, string VersionId)
-        {
-            var url = $"{_Applications}/{id}/Version/{VersionId}";
-            return await HttpHelper.Delete(url);
-        }
         // Patient --------------------------------------------------------------------------------------
         public async Task<ActionResponse> CreatePatient(Patient patient)
         {
@@ -166,7 +155,7 @@ namespace OperationsManager.Database
             var mergedDataStructures = new List<DataPoint>();
             foreach (var dataPoint in version.DataStructure)
             {
-                var commonSections = module.ModuleData.DataStructure.FirstOrDefault(c => c.SectionName == dataPoint.SectionName);
+                var commonSections = module.ModuleData.DataStructure.FirstOrDefault(c => c.SectionName == dataPoint.SectionName && c.ContextName == dataPoint.ContextName);
                 if (commonSections != null && dataPoint.isDataEditable == true)
                 {
                     dataPoint.Content = JsonHelper.MergeJsonStructures(dataPoint.Content.ToString(), commonSections.Content.ToString());
@@ -183,6 +172,7 @@ namespace OperationsManager.Database
             module.ModuleData.HtmlDashboard = version.HtmlDashboard;
             module.ModuleData.DataStructure = mergedDataStructures;
             module.ModuleData.VersionId = VersionId;
+            module.ModuleData.ActiveContextName = version.ActiveContextName;
             module.ModuleData.Timestamp = DateTime.UtcNow;
 
             url = $"{_Patients}/{Email}/Modules/{ModuleId}";
@@ -258,6 +248,10 @@ namespace OperationsManager.Database
             if (validateModule.Code != System.Net.HttpStatusCode.OK)
                 return validateModule;
             data.ModuleData.Timestamp = DateTime.UtcNow;
+
+            verify = ApplicationHelper.VerifyContext(data.ModuleData);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
 
             url = $"{_Patients}/{Email}/Modules/{ModuleId}";
 
@@ -361,6 +355,8 @@ namespace OperationsManager.Database
             }
 
             data.ModuleData.Timestamp = DateTime.UtcNow;
+            data.ModuleData.ActiveContextName = version.ActiveContextName;
+            
             url = $"{_Modules}";
             return await HttpHelper.Post(url, data);
         }
@@ -400,7 +396,7 @@ namespace OperationsManager.Database
             var mergedDataStructures = new List<DataPoint>();
             foreach(var dataPoint in version.DataStructure)
             {
-                var commonSections = data.ModuleData.DataStructure.FirstOrDefault(c => c.SectionName == dataPoint.SectionName);
+                var commonSections = data.ModuleData.DataStructure.FirstOrDefault(c => c.SectionName == dataPoint.SectionName && c.ContextName == dataPoint.ContextName);
                 if (commonSections != null && dataPoint.isDataEditable == true)
                 {
                     dataPoint.Content = JsonHelper.MergeJsonStructures(commonSections.Content.ToString(), dataPoint.Content.ToString());
@@ -415,11 +411,16 @@ namespace OperationsManager.Database
             data.ModuleData.HtmlCard = version.HtmlCard;
             data.ModuleData.HtmlDashboard = version.HtmlDashboard;
             data.ModuleData.VersionId = VersionId;
+            data.ModuleData.ActiveContextName = version.ActiveContextName;
             data.ModuleData.Timestamp = DateTime.UtcNow;
 
             var validateModule = ApplicationHelper.VerifyModuleStructure(application, data.ModuleData);
             if (validateModule.Code != System.Net.HttpStatusCode.OK)
                 return validateModule;
+
+            var verify = ApplicationHelper.VerifyContext(data.ModuleData);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
 
             url = $"{_Modules}/{id}";
             return await HttpHelper.Put(url, data);
@@ -466,6 +467,15 @@ namespace OperationsManager.Database
             if (verify.Code != System.Net.HttpStatusCode.OK)
                 return verify;
 
+            verify = ApplicationHelper.VerifyContext(data);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
+
+            verify = ApplicationHelper.VerifyDispairingContexts(data);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
+
+
             url = $"{_Modules}/{id}";
          
             var updatedModule = new Module
@@ -483,6 +493,126 @@ namespace OperationsManager.Database
             return await HttpHelper.Delete(url);
         }
 
-       
+        public async Task<ActionResponse> ModuleAddContext(string moduleId, string contextName)
+        {
+            var url = $"{_Modules}/{moduleId}";
+            // Find Module By Id
+            var moduleString = await HttpHelper.Get(url);
+            if (string.IsNullOrEmpty(moduleString))
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Module Not Found"
+                };
+            var data = JsonConvert.DeserializeObject<Module>(moduleString);
+            if (data.ModuleData.DataStructure.Any(c=>c.ContextName == contextName))
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Context Already Exists"
+                };
+
+            var existingContext = data.ModuleData.DataStructure.Where(c => c.ContextName == data.ModuleData.ActiveContextName);
+            var newContext = existingContext.Select(c => new DataPoint
+            {
+                ContextName = contextName,
+                SectionName = c.SectionName,
+                isDataEditable = c.isDataEditable,
+                Content = c.Content
+            }).ToList();
+            data.ModuleData.DataStructure = data.ModuleData.DataStructure.Concat(newContext).ToList();
+            data.ModuleData.ActiveContextName = contextName;
+            var verify = ApplicationHelper.VerifyContext(data.ModuleData);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
+
+            url = $"{_Modules}/{moduleId}";
+            return await HttpHelper.Put(url, data);
+        }
+
+        public async Task<ActionResponse> ModuleDeleteContext(string moduleId, string contextName)
+        {
+            var url = $"{_Modules}/{moduleId}";
+            // Find Module By Id
+            var moduleString = await HttpHelper.Get(url);
+            if (string.IsNullOrEmpty(moduleString))
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Module Not Found"
+                };
+            var data = JsonConvert.DeserializeObject<Module>(moduleString);
+           
+            data.ModuleData.DataStructure = data.ModuleData.DataStructure.Where(c=>c.ContextName != contextName).ToList();
+            if (data.ModuleData.ActiveContextName == contextName)
+            {
+                data.ModuleData.ActiveContextName = data.ModuleData.DataStructure.Select(c => c.ContextName).FirstOrDefault();
+            }
+         
+
+            url = $"{_Modules}/{moduleId}";
+            return await HttpHelper.Put(url, data);
+        }
+
+        public async Task<ActionResponse> AddContextToPatientModule(string patient, string moduleId, string contextName)
+        {
+            var url = $"{_Patients}/{patient}/Modules/{moduleId}";
+            // Find Module By Id
+            var moduleString = await HttpHelper.Get(url);
+            if (string.IsNullOrEmpty(moduleString))
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Module Not Found"
+                };
+            var data = JsonConvert.DeserializeObject<Module>(moduleString);
+            if (data.ModuleData.DataStructure.Any(c => c.ContextName == contextName))
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Context Already Exists"
+                };
+
+            var existingContext = data.ModuleData.DataStructure.Where(c => c.ContextName == data.ModuleData.ActiveContextName);
+            var newContext = existingContext.Select(c => new DataPoint
+            {
+                ContextName = contextName,
+                SectionName = c.SectionName,
+                isDataEditable = c.isDataEditable,
+                Content = c.Content
+            }).ToList();
+            data.ModuleData.DataStructure = data.ModuleData.DataStructure.Concat(newContext).ToList();
+            data.ModuleData.ActiveContextName = contextName;
+            var verify = ApplicationHelper.VerifyContext(data.ModuleData);
+            if (verify.Code != System.Net.HttpStatusCode.OK)
+                return verify;
+
+            url = $"{_Patients}/{patient}/Modules/{moduleId}";
+            return await HttpHelper.Put(url, data);
+        }
+
+        public async Task<ActionResponse> DeleteContextFromPatientModule(string patient, string moduleId, string contextName)
+        {
+            var url = $"{_Patients}/{patient}/Modules/{moduleId}";
+            // Find Module By Id
+            var moduleString = await HttpHelper.Get(url);
+            if (string.IsNullOrEmpty(moduleString))
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Module Not Found"
+                };
+            var data = JsonConvert.DeserializeObject<Module>(moduleString);
+
+            data.ModuleData.DataStructure = data.ModuleData.DataStructure.Where(c => c.ContextName != contextName).ToList();
+            if (data.ModuleData.ActiveContextName == contextName)
+            {
+                data.ModuleData.ActiveContextName = data.ModuleData.DataStructure.Select(c => c.ContextName).FirstOrDefault();
+            }
+
+
+            url = $"{_Patients}/{patient}/Modules/{moduleId}";
+            return await HttpHelper.Put(url, data);
+        }
     }
 }

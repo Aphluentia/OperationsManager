@@ -1,7 +1,9 @@
 ﻿using Amazon.Auth.AccessControlPolicy.ActionIdentifiers;
 using DatabaseApi.Models.Entities;
 using OperationsManager.Database.Entities;
+using System;
 using System.Text.Json;
+using static System.Collections.Specialized.BitVector32;
 
 namespace OperationsManager.Helpers
 {
@@ -52,8 +54,8 @@ namespace OperationsManager.Helpers
                 };
 
             var moduleDataStructure = module.DataStructure;
-            var dataStructureSections = dataStructure.DataStructure.Select(c => c.SectionName).ToList();
-            var moduleDataStructureSections = moduleDataStructure.Select(c => c.SectionName).ToList();
+            var dataStructureSections = dataStructure.DataStructure.Select(c => c.SectionName).ToHashSet<string>();
+            var moduleDataStructureSections = moduleDataStructure.Select(c => c.SectionName).ToHashSet<string>();
             
             if (!dataStructureSections.All(c=>moduleDataStructureSections.Contains(c)) || dataStructureSections.Count() < moduleDataStructureSections.Count() )
             {
@@ -63,27 +65,31 @@ namespace OperationsManager.Helpers
                     Message = "Incorrect Data Structure"
                 };
             }
+
+           
             foreach(DataPoint section in dataStructure.DataStructure)
             {
-                var moduleSection = moduleDataStructure.FirstOrDefault(c => c.SectionName == section.SectionName);
-                if (!JsonHelper.IsJsonStructure(section.Content.ToString()) || !JsonHelper.IsJsonStructure(moduleSection.Content.ToString()))
+
+                var moduleSections = moduleDataStructure.Where(c => c.SectionName == section.SectionName);
+                foreach(var sectionContext in moduleSections)
                 {
-                    return new ActionResponse
+                    if (!JsonHelper.IsJsonStructure(sectionContext.Content.ToString()) || !JsonHelper.IsJsonStructure(section.Content.ToString()))
                     {
-                        Code = System.Net.HttpStatusCode.BadRequest,
-                        Message = "Json is Invalid"
-                    };
-                }
-           
-                if (!section.isDataEditable && section.Content!=moduleSection.Content)
-                {
-                    return new ActionResponse
+                        return new ActionResponse
+                        {
+                            Code = System.Net.HttpStatusCode.BadRequest,
+                            Message = "Json is Invalid"
+                        };
+                    }
+                    if (!section.isDataEditable && section.Content != sectionContext.Content)
                     {
-                        Code = System.Net.HttpStatusCode.BadRequest,
-                        Message = $"Content of Section {section.SectionName} is not Editable"
-                    };
+                        return new ActionResponse
+                        {
+                            Code = System.Net.HttpStatusCode.BadRequest,
+                            Message = $"Content of Section {section.SectionName} is not Editable"
+                        };
+                    }
                 }
-            
             }
             return new ActionResponse
             {
@@ -110,5 +116,73 @@ namespace OperationsManager.Helpers
             };
         }
 
+        public static ActionResponse VerifyContext(ModuleVersion version)
+        {
+            var SectionsAndContexts = version.DataStructure.ToList().Select(c => (c.SectionName, c.ContextName));
+            var duplicates = SectionsAndContexts.GroupBy(c => c)
+                                        .Where(group => group.Count() > 1)
+                                        .Select(group => group.Key)
+                                        .ToList();
+            if (duplicates.Count() > 0)
+            {
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Not Updated Because There are Repeated Data Entries"
+                };
+            }
+            if (!SectionsAndContexts.Any(c=>c.ContextName == version.ActiveContextName))
+            {
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Active Context Name Doesnt Exist"
+                };
+            }
+            
+            return new ActionResponse
+            {
+                Code = System.Net.HttpStatusCode.OK,
+                Message = ""
+            };
+        }
+
+        public static ActionResponse VerifyDispairingContexts(ModuleVersion v)
+        {
+            
+            var SectionsAndContexts = v.DataStructure.ToList().Select(c=>(c.SectionName, c.ContextName)).ToList();
+            var occurrenceCounts = SectionsAndContexts
+                                .GroupBy(entry => entry)
+                                .ToDictionary(group => group.Key, group => group.Count());
+            if (occurrenceCounts.Any(c=>c.Value!=occurrenceCounts.FirstOrDefault().Value)) 
+            {
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Not all Sections are present in different profiles"
+                };
+            }
+
+            var SectionsAndIsEditable = v.DataStructure.ToList().Select(c => (c.SectionName, c.isDataEditable)).ToList();
+            var inconsistentSections = SectionsAndIsEditable
+                                .GroupBy(entry => entry.SectionName)
+                                .Where(group => group.Select(entry => entry.isDataEditable).Distinct().Count() > 1)
+                                .Select(group => group.Key)
+                                .ToList();
+            if (inconsistentSections.Any())
+            {
+                return new ActionResponse
+                {
+                    Code = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Sections in Different Profiles Can't Have different editability configurations"
+                };
+            }
+
+            return new ActionResponse
+            {
+                Code = System.Net.HttpStatusCode.OK,
+                Message = ""
+            };
+        }
     }
 }

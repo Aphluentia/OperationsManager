@@ -65,33 +65,12 @@ namespace OperationsManager.BackgroundServices.Workers
                                 success = await _database.RegisterApplicationVersion(ADD_APPLICATION_VERSION.Id, ADD_APPLICATION_VERSION.Data);
                             LogHelper.WriteLog($"Performing register application version operation with success:{success}");
                             break;
-
-                        //case Operation.UPDATE_APPLICATION_VERSION:
-                        //    var UPDATE_APPLICATION_VERSION = JsonConvert.DeserializeObject<UpdateDto<ModuleVersion>>(stringData);
-
-                        //    if (UPDATE_APPLICATION_VERSION != null)
-                        //        success = await _database.UpdateApplicationVersion(UPDATE_APPLICATION_VERSION.Id, UPDATE_APPLICATION_VERSION.Id2, UPDATE_APPLICATION_VERSION.Data);
-                        //    LogHelper.WriteLog($"Performing update application version operation with success:{success}");
-                        //    break;
-
-                        case Operation.DELETE_APPLICATION_VERSION:
-                            var DELETE_APPLICATION_VERSION = JsonConvert.DeserializeObject<DeleteDto>(stringData);
-                            if (DELETE_APPLICATION_VERSION != null)
-                                success = await _database.DeleteApplicationVersion(DELETE_APPLICATION_VERSION.Id, DELETE_APPLICATION_VERSION.Id2);
-                            LogHelper.WriteLog($"Performing delete application version operation with success:{success}");
-                            break;
-
-                        case Operation.DELETE_APPLICATION:
-                            var DELETE_APPLICATION = JsonConvert.DeserializeObject<DeleteDto>(stringData);
-                            if (DELETE_APPLICATION != null)
-                                success = await _database.DeleteApplication(DELETE_APPLICATION.Id);
-                            LogHelper.WriteLog($"Performing delete application operation with success:{success}");
-                            break;
-
                         case Operation.CREATE_MODULE:
                             var CREATE_MODULE = JsonConvert.DeserializeObject<Module>(stringData);
                             if (CREATE_MODULE != null)
                                 success = await _database.CreateModule(CREATE_MODULE);
+                            if (success.Code == System.Net.HttpStatusCode.OK)
+                                success.Message = CREATE_MODULE.Id.ToString();
                             LogHelper.WriteLog($"Performing create module operation with success:{success}");
                             break;
 
@@ -103,14 +82,13 @@ namespace OperationsManager.BackgroundServices.Workers
                             LogHelper.WriteLog($"Performing update module operation with success:{success}");
                             break;
 
-                        case Operation.UPDATE_MODULE_VERSION:
+                        case Operation.UPDATE_MODULE_TO_VERSION:
                             var UPDATE_MODULE_TO_VERSION = JsonConvert.DeserializeObject<DeleteDto>(stringData);
 
                             if (UPDATE_MODULE_TO_VERSION != null)
                                 success = await _database.UpdateModuleToVersion(UPDATE_MODULE_TO_VERSION.Id, UPDATE_MODULE_TO_VERSION.Id2);
                             LogHelper.WriteLog($"Performing update module to version operation with success:{success}");
                             break;
-                      
                         case Operation.DELETE_MODULE:
                             var DELETE_MODULE = JsonConvert.DeserializeObject<DeleteDto>(stringData);
 
@@ -148,9 +126,10 @@ namespace OperationsManager.BackgroundServices.Workers
                             break;
                         case Operation.PATIENT_NEW_MODULE:
                             var ADD_PATIENT_NEW_MODULE = JsonConvert.DeserializeObject<UpdateDto<Module>>(stringData);
-
                             if (ADD_PATIENT_NEW_MODULE != null)
                                 success = await _database.AddModuleToPatient(ADD_PATIENT_NEW_MODULE.Id, ADD_PATIENT_NEW_MODULE.Data);
+                            if (success.Code == System.Net.HttpStatusCode.OK)
+                                success.Message = ADD_PATIENT_NEW_MODULE.Data.Id.ToString();
                             LogHelper.WriteLog($"Performing add module to patient operation with success:{success}");
                             break;
                         case Operation.UPDATE_PATIENT_MODULE:
@@ -160,7 +139,7 @@ namespace OperationsManager.BackgroundServices.Workers
                                 success = await _database.UpdatePatientModule(UPDATE_PATIENT_MODULE.Id, Guid.Parse(UPDATE_PATIENT_MODULE.Id2), UPDATE_PATIENT_MODULE.Data);
                             LogHelper.WriteLog($"Performing update patient module operation with success:{success}");
                             break;
-                        case Operation.UPDATE_PATIENT_MODULE_VERSION:
+                        case Operation.UPDATE_PATIENT_MODULE_TO_VERSION:
                             var UPDATE_PATIENT_MODULE_VERSION = JsonConvert.DeserializeObject<UpdateDto<Module>>(stringData);
 
                             if (UPDATE_PATIENT_MODULE_VERSION != null)
@@ -216,6 +195,30 @@ namespace OperationsManager.BackgroundServices.Workers
                             var THERAPIST_REJECT_PATIENT = JsonConvert.DeserializeObject<DeleteDto>(stringData);
                             if (THERAPIST_REJECT_PATIENT != null)
                                 success = await _database.TherapistRejectPatient(THERAPIST_REJECT_PATIENT.Id, THERAPIST_REJECT_PATIENT.Id2);
+                            LogHelper.WriteLog($"Performing therapist reject patient operation with success:{success}");
+                            break;
+                        case Operation.MODULE_ADD_CONTEXT:
+                            var MODULE_ADD_CONTEXT = JsonConvert.DeserializeObject<DeleteDto>(stringData);
+                            if (MODULE_ADD_CONTEXT != null)
+                                success = await _database.ModuleAddContext(MODULE_ADD_CONTEXT.Id, MODULE_ADD_CONTEXT.Id2);
+                            LogHelper.WriteLog($"Performing therapist reject patient operation with success:{success}");
+                            break;
+                        case Operation.MODULE_DELETE_CONTEXT:
+                            var MODULE_DELETE_CONTEXT = JsonConvert.DeserializeObject<DeleteDto>(stringData);
+                            if (MODULE_DELETE_CONTEXT != null)
+                                success = await _database.ModuleDeleteContext(MODULE_DELETE_CONTEXT.Id, MODULE_DELETE_CONTEXT.Id2);
+                            LogHelper.WriteLog($"Performing therapist reject patient operation with success:{success}");
+                            break;
+                        case Operation.PATIENT_MODULE_ADD_CONTEXT:
+                            var PATIENT_MODULE_ADD_CONTEXT = JsonConvert.DeserializeObject<DeleteDto>(stringData);
+                            if (PATIENT_MODULE_ADD_CONTEXT != null)
+                                success = await _database.AddContextToPatientModule(PATIENT_MODULE_ADD_CONTEXT.Id, PATIENT_MODULE_ADD_CONTEXT.Id2, PATIENT_MODULE_ADD_CONTEXT.Id3);
+                            LogHelper.WriteLog($"Performing therapist reject patient operation with success:{success}");
+                            break;
+                        case Operation.PATIENT_MODULE_DELETE_CONTEXT:
+                            var PATIENT_MODULE_DELETE_CONTEXT = JsonConvert.DeserializeObject<DeleteDto>(stringData);
+                            if (PATIENT_MODULE_DELETE_CONTEXT != null)
+                                success = await _database.DeleteContextFromPatientModule(PATIENT_MODULE_DELETE_CONTEXT.Id, PATIENT_MODULE_DELETE_CONTEXT.Id2, PATIENT_MODULE_DELETE_CONTEXT.Id3);
                             LogHelper.WriteLog($"Performing therapist reject patient operation with success:{success}");
                             break;
                         default:
