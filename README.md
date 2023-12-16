@@ -1,5 +1,5 @@
-# OperationsManager  
-Logic Carrier  
+# OperationsManager   
+Intermediary between the application and Kafka broker. Orchestrates operations, validates data, and ensures secure data processing. Implements multithreading for efficient operation processing.  
 
 ## Setup       
 - docker build . -t operationsmanager    
