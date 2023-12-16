@@ -207,6 +207,7 @@ namespace OperationsManager.Database
 
 
             data.ModuleData.Timestamp = DateTime.UtcNow;
+            
 
             url = $"{_Patients}/{Email}/Modules";
             return await HttpHelper.Post(url, data);
@@ -355,7 +356,6 @@ namespace OperationsManager.Database
             }
 
             data.ModuleData.Timestamp = DateTime.UtcNow;
-            data.ModuleData.ActiveContextName = version.ActiveContextName;
             
             url = $"{_Modules}";
             return await HttpHelper.Post(url, data);
